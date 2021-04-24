@@ -2,24 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia; // use Inertia class
+use App\Models\Post;
+use Inertia\Inertia;
 
-class HomeController extends Controller{
+// use Inertia class
 
-    public function index(){
-        
-        return Inertia::render('Home/Index', [
+class HomeController extends Controller
+{
 
-            'name'=>'World!'
+    public function index()
+    {
 
-        ]);
+        $posts = Post::with('category')->get();
+
+        return Inertia::render('Home/Index', $posts);
     }
 
-    public function about(){ 
-        
-        return Inertia::render('About/Index'); 
-    
+    public function about()
+    {
+
+        return Inertia::render('About/Index');
+
     }
 
 }

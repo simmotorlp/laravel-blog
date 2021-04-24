@@ -1,4 +1,5 @@
 const mix = require('laravel-mix');
+const SVGSpritemapPlugin = require('svg-spritemap-webpack-plugin');
 
 /*
  |--------------------------------------------------------------------------
@@ -14,14 +15,37 @@ const mix = require('laravel-mix');
 mix.js('resources/js/app.js', 'public/js').vue({
     extractStyles: true,
     globalStyles: false
-});
+})
+    .sass('resources/scss/app.scss', 'public/css/app.css')
+    .sourceMaps()
+    .copy('resources/images/**/*.*', 'public/images')
+    .copyDirectory('resources/fonts', 'public/fonts')
+    .browserSync({
+        proxy: '127.0.0.1:8000',
+        logConnections: false,
+        notify: false
+    });
 
-mix.postCss('resources/css/app.css', 'public/css', [
-        //
-    ]);
 
-mix.webpackConfig({
-    output: {
-        chunkFilename: 'js/[name].js?id=[chunkhash]',
+mix.webpackConfig(webpack => {
+    return {
+        output: {
+            chunkFilename: 'js/[name].js?id=[chunkhash]',
+        },
+        plugins: [
+            new SVGSpritemapPlugin('resources/svg/*.svg', {
+                output: {
+                    filename: 'images/sprite.svg',
+                },
+                sprite: {
+                    generate: {
+                        title: false
+                    }
+                }
+            }),
+            new webpack.DefinePlugin({
+                'process.env.NODE_ENV': JSON.stringify('development')
+            })
+        ]
     }
 })
